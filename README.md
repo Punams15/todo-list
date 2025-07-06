@@ -1,12 +1,25 @@
-# React + Vite
+App name and description
+todo-list App
+Title: My Todos
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+Installation instructions
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Instructions Part 1: Repo Setup for the Todo App
+Create new public repo on GitHub
+give it the name "todo-list" or something similar and description
+don't add a .gitignore or a license
+clone the repo to your local environment (this differs based on if you're using HTTPS, SSH, or GitHub Desktop. See GitHub's documentation on remote repos for more details.)
+don't create a new branch yet - remain on main branch
+Instructions Part 2: Installation
+Scaffold Vite Using CLI
+Bootstrap a new project with command: npm create vite@latest . -- --template react
+Install with command: npm install
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+How to run the development server
+
+Start the app with the following command:
+in bash: npm run dev   /* npm run <<scriptKey>> */
+Then open your bowser and go to: http://localhost:5173
