@@ -1,21 +1,17 @@
 import TodoListItem from "./TodoListItem";
-function TodoList() {  
-    const todos = [
-    {id: 1, title: "review resources"},
-    {id: 2, title: "take notes"},
-    {id: 3, title: "code out app"},
-]
+function TodoList({todoList}) {  
+  
   return (
-  <div>
+  
      
       <ul>
-        {todos.map(todo => (
-          <TodoListItem key={todo.id} todo={todo}/>
-        ))}
-      </ul>
+            {todoList.map(todo => <TodoListItem key={todo.id} todo={todo} />)}
+        </ul>
       
-    </div>
+    
   )
    
 }
 export default TodoList;
+
+//Destructure todoList out of the component's props argument"means you're taking out the todoList prop directly inside the function parameters instead of accessing it through props.todoList.
