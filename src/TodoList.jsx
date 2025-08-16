@@ -1,17 +1,21 @@
 import TodoListItem from "./TodoListItem";
-function TodoList({todoList}) {  
-  
-  return (
-  
-     
-      <ul>
-            {todoList.map(todo => <TodoListItem key={todo.id} todo={todo} />)}
-        </ul>
-      
-    
+
+function TodoList({ todoList, onCompleteTodo }) {
+  const filteredTodoList = todoList.filter(todo => !todo.isCompleted);
+
+  return todoList.length === 0 ? (       //Syntax: return condition ? (expressionIfTrue) : (expressionIfFalse);
+    <p>Add todo above to get started</p>
+  ) : (
+    <ul>
+      {filteredTodoList.map(todo => (
+        <TodoListItem
+          key={todo.id}
+          todo={todo}
+          onCompleteTodo={onCompleteTodo}
+        />
+      ))}
+    </ul>
   )
-   
 }
 export default TodoList;
 
-//Destructure todoList out of the component's props argument"means you're taking out the todoList prop directly inside the function parameters instead of accessing it through props.todoList.
