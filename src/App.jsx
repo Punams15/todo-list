@@ -1,7 +1,7 @@
 import './App.css'
 import { useState } from 'react'
-import TodoList from './TodoList'
-import TodoForm from './TodoForm'
+import TodoList from './features/TodoList/TodoList'
+import TodoForm from './features/TodoForm'
 function App() {
 // Creates the new todo and updates the list
   const [todoList, setTodoList] = useState([]);   //empty array is used because todolist is empty at first and will be added later
