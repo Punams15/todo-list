@@ -20,17 +20,25 @@ function App() {
     const updatedTodos = todoList.map(todo => 
       todo.id === id ? {...todo, isCompleted: true }: todo )
     //update 'todos' state with 'updatedTodos
-    return setTodoList(updatedTodos)    //calling the setTodoList function (the React state updater) and passing it the new list of todos (updatedTodos).That updates your component’s todoList state with the latest version.
+    setTodoList(updatedTodos)    //calling the setTodoList function (the React state updater) and passing it the new list of todos (updatedTodos).That updates your component’s todoList state with the latest version.
+  }
+
+  // Update an existing todo
+  function updateTodo(editedTodo) {
+    const updatedTodos = todoList.map(todo =>
+      todo.id === editedTodo.id ? { ...editedTodo } : todo
+    );
+    setTodoList(updatedTodos);
   }
 
   return (
     <div>
-      <h1>Todo App</h1>
+      <h1>Todo List</h1>
      
       <TodoForm onAddTodo={addTodo}/>  {/*Pass the function to an onAddTodo props on the TodoForm instance */}
 
-     {/* Pass the helper function as a prop named onCompleteTodo */}
-      <TodoList todoList={todoList} onCompleteTodo={CompleteTodo}/>   {/*Renders the TodoList component, passing in todoList as a prop with the current todoList state */}  
+     {/* Pass the helper function as a prop named onCompleteTodo and added updateTodo*/}
+      <TodoList todoList={todoList} onCompleteTodo={CompleteTodo} onUpdateTodo= {updateTodo}/>   {/*Renders the TodoList component, passing in todoList as a prop with the current todoList state */}  
     </div>
   )
 }

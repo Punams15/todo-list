@@ -7,7 +7,7 @@ return (
 id={elementId}
 ref={ref}
 value={value}
-onChnage={onChange}
+onChange={onChange}
 />
 
 </>
