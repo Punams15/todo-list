@@ -29,7 +29,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
           <>
             <TextInputWithLabel value={workingTitle} onChange={handleEdit} elementId={todo.id} label/>
             <button onClick={handleCancel}>Cancel</button>
-              <button onClick={handleUpdate}>Update</button>
+              <button type="submit" onClick={handleUpdate}>Update</button>
           </>
         ) :(
           <>
