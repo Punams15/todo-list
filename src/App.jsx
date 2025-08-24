@@ -1,10 +1,22 @@
 import './App.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import TodoList from './features/TodoList/TodoList'
 import TodoForm from './features/TodoForm'
 function App() {
-// Creates the new todo and updates the list
+// state Variables
   const [todoList, setTodoList] = useState([]);   //empty array is used because todolist is empty at first and will be added later
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState (" ")
+
+ //Airtable constants
+  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
+  const token = `Bearer ${import.meta.env.VITE_PAT}`; 
+
+//Fetch todos from Airtable
+  useEffect(() => {
+    const fetchTodos = async () => {};
+    fetchTodos();
+}, [])
 
   function addTodo(title) {
     const newTodo = {
