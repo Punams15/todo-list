@@ -9,6 +9,11 @@ function App() {
   const [errorMessage, setErrorMessage] = useState ("")//"" --> Start empty, no mistakes yet// Stores error messages
   const [isSaving, setIsSaving]=useState(false)//while I'm saving mode before and mark saving started or finished..false:Not saving yet
 
+  const [sortField, setSortField] = useState("createdTime")
+  const [sortDirection, setSortDirection] = useState("desc")
+
+  const [queryString, setQueryString] = useState(""); // search filter
+
  //Airtable constants
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`; //like the address where we send our request to get todos
   const token = `Bearer ${import.meta.env.VITE_PAT}`;   //secret key
