@@ -135,6 +135,16 @@ fetchTodos()   //tells: You gotta start it!
       <h1>Todo List</h1>
      <TodoForm onAddTodo={addTodo} isSaving={isSaving} /> {/*Pass the function to an onAddTodo props on the TodoForm instance */}
 
+       {/* Show the todos only when not loading */}
+    {!isLoading && (
+<TodoList todoList={todoList} onCompleteTodo={CompleteTodo} onUpdateTodo= {updateTodo}/>  
+  )
+  
+}
+
+      {/* Separator line */}
+    <hr style={{ margin: "20px 0" }} />
+
          {/* Search + Sort Form */}
       <TodosViewForm
         sortField={sortField}
@@ -152,14 +162,8 @@ fetchTodos()   //tells: You gotta start it!
 
 
 
-     {/* Show the todos only when not loading */}
-    {!isLoading && (
-<TodoList todoList={todoList} onCompleteTodo={CompleteTodo} onUpdateTodo= {updateTodo}/>  
-  )
-  
-}
- {/* Separator line */}
-    <hr style={{ margin: "20px 0" }} />
+   
+
  {/* Error message section at the bottom */}
      {/*show error message if any */}
      {errorMessage && (
