@@ -13,16 +13,18 @@ function TodosViewForm({
     <form onSubmit={preventRefresh} style={{ marginBottom: "20px" }}>
       {/* Search box */}
       <div>
-        <label>Search todos: </label>
-        <input
-          type="text"
-          value={queryString}
-          onChange={(e) => setQueryString(e.target.value)}
-        />
-        <button type="button" onClick={() => setQueryString("")}>
-          Clear
-        </button>
-      </div>
+  <label htmlFor="todo-search">Search todos: </label>
+  <input
+    id="todo-search"
+    type="text"
+    placeholder="Type to search..."
+    value={queryString}
+    onChange={(e) => setQueryString(e.target.value)}
+  />
+  <button type="button" onClick={() => setQueryString("")}>
+    Clear
+  </button>
+</div>
 
       {/* Sort field */}
       <div>
@@ -34,8 +36,7 @@ function TodosViewForm({
     setSortDirection(dir);    // → "asc" or "desc"
   }}
 >
-           <option value="createdTime-desc">Newest first</option>
-            <option value="createdTime-asc">Oldest first</option>
+       <option value="createdTime">Time Added</option>
             <option value="Title-asc">Title A–Z</option>
             <option value="Title-desc">Title Z–A</option>
         </select>
