@@ -24,7 +24,7 @@ function App() {
     let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
     let searchQuery = "";
     if (queryString) {
-      searchQuery = `&filterByFormula=SEARCH("${queryString}", {Title})`; //capital T
+      searchQuery = `&filterByFormula=SEARCH("${queryString}", {Title})`; //capital T //+{Title} , + removed ,nothing changed in result?
     }
     return encodeURI(`${url}?${sortQuery}${searchQuery}`);
   }
