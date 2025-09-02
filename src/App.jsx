@@ -24,7 +24,7 @@ function App() {
     let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
     let searchQuery = "";
     if (queryString) {
-      searchQuery = `&filterByFormula=SEARCH("${queryString}", {title})`;
+      searchQuery = `&filterByFormula=SEARCH("${queryString}", {Title})`; //capital T
     }
     return encodeURI(`${url}?${sortQuery}${searchQuery}`);
   }
@@ -41,7 +41,7 @@ function App() {
         }
       }
       try {                                  //catch the mistake if it doesn't work
-        const resp = await fetch(url,options) //its like sending call to airtbale at the url and waiting for the reply
+        const resp = await fetch(encodeUrl({sortField, sortDirection, queryString}),options) //its like sending call to airtbale at the url and waiting for the reply
         if (!resp.ok) 
           throw new Error(resp.statusText)                                          
 
@@ -55,6 +55,7 @@ function App() {
             if (!todo.isCompleted) todo.isCompleted = false; //Airtable skips false..and if airtable forgots to send isCompleted,we force it to be false
             return todo
           })
+          .filter(todo => todo.Title && todo.Title.trim() !=="") //remove empty todos
           setTodoList(todos)        //stick all the todos onto out todoList sticky note
         } catch (error) {
           console.error(error)
@@ -68,16 +69,16 @@ fetchTodos()   //tells: You gotta start it!
 }, [sortField, sortDirection, queryString])   //refresh whenever these chnage //End of useEffect. The empty [] means: “Run this only once, when the app starts.”
 
  // Add new todo (pessimistic update)
-  async function addTodo(title) {
+  async function addTodo(Title) {
     const newTodo = {
-      title: title,
+      Title: Title,
       isCompleted: false,
     };
 
     const payload = {       //like putting our sticky note inside an envelope
       records: [           // records: list of letters (even its just one)
         {
-          fields: newTodo,      // fields : the contents of the letter (title +isCompleted)
+          fields: newTodo,      // fields : the contents of the letter (Title +isCompleted)
         },
       ],
     };

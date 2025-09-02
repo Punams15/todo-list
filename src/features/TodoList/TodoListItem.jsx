@@ -2,11 +2,11 @@ import { useState } from 'react';
 import TextInputWithLabel from '../../shared/TextInputWithLabel';
 function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [workingTitle, setWorkingTitle] = useState(todo.title); //Local state for editing
+  const [workingTitle, setWorkingTitle] = useState(todo.Title); //Local state for editing
 
-  //cancel editing -> reset back to original todo.title
+  //cancel editing -> reset back to original todo.Title
   function handleCancel() {
-    setWorkingTitle(todo.title);
+    setWorkingTitle(todo.Title);
     setIsEditing(false);
   }
   //update local state while typing and e variable is event here
@@ -18,7 +18,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
   function handleUpdate(e) {
     if (!isEditing) return; // exit if not editing
     e.preventDefault();
-    onUpdateTodo({ ...todo, title: workingTitle });
+    onUpdateTodo({ ...todo, Title: workingTitle });
     setIsEditing(false);
   }
 
@@ -42,7 +42,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
               />
             </label>
 
-            <span onClick={() => setIsEditing(true)}>{todo.title}</span>
+            <span onClick={() => setIsEditing(true)}>{todo.Title}</span>
           </>
         )}
       </form>

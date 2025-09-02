@@ -27,9 +27,17 @@ function TodosViewForm({
       {/* Sort field */}
       <div>
         <label>Sort by: </label>
-        <select value={sortField} onChange={(e) => setSortField(e.target.value)}>
-          <option value="title">Title</option>
-          <option value="createdTime">Time Added</option>
+        <select value={`${sortField}-${sortDirection}`} 
+ onChange={(e) => {
+    const [field, dir] = e.target.value.split("-");
+    setSortField(field);      // → "Title"
+    setSortDirection(dir);    // → "asc" or "desc"
+  }}
+>
+           <option value="createdTime-desc">Newest first</option>
+            <option value="createdTime-asc">Oldest first</option>
+            <option value="Title-asc">Title A–Z</option>
+            <option value="Title-desc">Title Z–A</option>
         </select>
       </div>
 
