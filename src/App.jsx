@@ -213,3 +213,8 @@ export default App
 //replacing setErrorMessage(error.message)  to   setErrorMessage("NetworkError when attempting to fetch resource..Reverting todo..");
 
 //replacing <p style ={{ color: "red" }} >{errorMessage}</p> to <p style ={{ color: "red" }} >{"NetworkError when attempting to fetch resource..Reverting todo.."}</p>
+
+
+//https://spoonacular.com/food-api
+//https://spoonacular.com/food-api/pricing
+//https://github.com/Code-the-Dream-School/ctd-ingredient-recipes
