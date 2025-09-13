@@ -1,4 +1,5 @@
 import './App.css'
+import { useCallback } from 'react'
 import { useEffect, useState } from 'react'
 import TodoList from './features/TodoList/TodoList'
 import TodoForm from './features/TodoForm'
@@ -19,18 +20,20 @@ function App() {
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`; //like the address where we send our request to get todos
   const token = `Bearer ${import.meta.env.VITE_PAT}`;   //secret key
 
- // Helper: encode Airtable request
-  function encodeUrl({ sortField, sortDirection, queryString }) {
+// encodeUrl rewritten with useCallback
+const encodeUrl = useCallback(() => {
     let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
     let searchQuery = "";
     if (queryString) {
       searchQuery = `&filterByFormula=SEARCH("${queryString}", {Title})`; //capital T //+{Title} , + removed ,nothing changed in result?
     }
     return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-  }
+  } , [sortField, sortDirection, queryString, url]);
 
 //Fetch todos from Airtable 
   useEffect(() => {
+    console.log("Fetching todos with query:", queryString)
+    
     const fetchTodos = async () => {
       setIsLoading(true); // show loading spinner/message
 
@@ -41,7 +44,7 @@ function App() {
         }
       }
       try {                                  //catch the mistake if it doesn't work
-        const resp = await fetch(encodeUrl({sortField, sortDirection, queryString}),options) //its like sending call to airtbale at the url and waiting for the reply
+        const resp = await fetch(encodeUrl(), options)
         if (!resp.ok) 
           throw new Error(resp.statusText)                                          
 
@@ -210,3 +213,8 @@ export default App
 //replacing setErrorMessage(error.message)  to   setErrorMessage("NetworkError when attempting to fetch resource..Reverting todo..");
 
 //replacing <p style ={{ color: "red" }} >{errorMessage}</p> to <p style ={{ color: "red" }} >{"NetworkError when attempting to fetch resource..Reverting todo.."}</p>
+
+
+//https://spoonacular.com/food-api
+//https://spoonacular.com/food-api/pricing
+//https://github.com/Code-the-Dream-School/ctd-ingredient-recipes
