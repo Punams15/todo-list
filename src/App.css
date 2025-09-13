@@ -1,5 +1,17 @@
+/* Background */
 body {
- background: url("./assets/back.jpg") no-repeat center center fixed;
+ margin: 0;
+ padding: 0;
+ background-color: #fff2df;
+ background: url("./assets/bg1.jpg") no-repeat center center fixed;
  background-size: cover;
-
 }
+#root {
+  /*min-height: 100vh;*/
+  display: flex;
+  justify-content: center;
+  /*align-items: flex-start;*/
+  padding: 2rem;
+}
+
+
