@@ -4,6 +4,8 @@ body {
  padding: 0;
  background-color: #fff2df;
  background: url("./assets/bg1.jpg") no-repeat center center fixed;
+ background: url("./assets/floral.jpg") no-repeat center center fixed;
+ background: url("./assets/multi.jpg") no-repeat center center fixed;
  background-size: cover;
 }
 #root {
