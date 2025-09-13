@@ -218,3 +218,24 @@ export default App
 //https://spoonacular.com/food-api
 //https://spoonacular.com/food-api/pricing
 //https://github.com/Code-the-Dream-School/ctd-ingredient-recipes
+
+
+
+//Basic Hooks
+//A React Hook is a function that allows functional components add state, integrate with side-effects, and work with other React features. We can also develop our own custom hooks to encapsulate logic into reusable functions. Hooks were introduced in React 16.8 (released February 2019) and gave functional components access to features that were previously available to only class-based components. We won't be working with class-based components but it's important to be aware they exist since you may encounter them in older codebases.
+
+//The existing hooks can be broken down into several categories. We'll highlight the common ones.
+
+  //state - stores information like user input that is used to help render components
+  //useState: keeps track of a single, updatable value
+  //useReducer: used when there are a lot of values to track and update in a component - covered in week 11
+  //context - refers to a way to share data between components without having to pass props
+//  useContext allows a component to read and subscribe to a defined context - covered in week 11
+  //effects
+  //useEffect: allows us to run side effects like loading data or working with non-React page code - more in week 7.
+  //refs - short for "reference" - they allow us to save and work with values that persist across renders but are not used for rendering
+  //useRef: creates a ref that can hold a value or commonly to access a DOM node
+  //performance: optimizes re-render performance by allowing unnecessary re-rendering to be skipped - more in week 9.
+  //useMemo: caches result of an expensive calculation
+  //useCallback: caches a function definition between re-renders
+  //custom: hooks created by the developer or imported from a 3rd party library to encapsulate re-usable logic - advanced topic not covered in this course
