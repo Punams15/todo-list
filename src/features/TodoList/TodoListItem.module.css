@@ -1,0 +1,7 @@
+.item {
+  padding-bottom: 0.5rem;
+}
+
+.completed {
+  text-decoration: line-through;
+}

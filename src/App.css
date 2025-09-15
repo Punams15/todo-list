@@ -1,19 +1,57 @@
 /* Background */
+/* Global font families */
 body {
  margin: 0;
  padding: 0;
  background-color: #fff2df;
- background: url("./assets/bg1.jpg") no-repeat center center fixed;
- background: url("./assets/floral.jpg") no-repeat center center fixed;
- background: url("./assets/multi.jpg") no-repeat center center fixed;
+  background: url("./assets/multi.jpg") no-repeat center center fixed;  
+ background: url("./assets/bg2.jpeg") no-repeat center center fixed;
+ background: url("./assets/floral.jpg") no-repeat center center fixed; 
  background-size: cover;
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 #root {
-  /*min-height: 100vh;*/
+  min-height: 100vh;
   display: flex;
   justify-content: center;
-  /*align-items: flex-start;*/
+  align-items: flex-start;
   padding: 2rem;
 }
+/* Headings use a different font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Georgia', serif;
+  margin: 0.5rem 0;
+  color: #1a2a3a; /* darker heading color */
+}
+/* Buttons */
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #3b82f6;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease-in-out;
+}
+button:hover {
+  background-color: orange;
+  border: 0.4rem solid rgb(228, 99, 206);
+}
+button:disabled {
+  background-color: #a7b3c4;
+  cursor: not-allowed;
+}
+/* Inputs */
+input, textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  /*width: 100%;*/
+  box-sizing: border-box;
+}
+
+
 
 

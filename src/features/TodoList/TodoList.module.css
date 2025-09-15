@@ -1,0 +1,13 @@
+.todoList {
+  padding: 0; /* remove extra padding */
+  list-style: none; /* remove bullets */
+  margin: 0 auto;
+  display: flex;        /* use flexbox */
+  flex-direction: column; /* stack items vertically */
+  text-align:left;
+}
+
+.todoList li {
+  padding: 0.5rem;
+  
+}
