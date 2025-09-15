@@ -1,7 +1,41 @@
+
 .item {
   padding-bottom: 0.5rem;
 }
 
 .completed {
   text-decoration: line-through;
+}
+
+
+.customCheckbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.customCheckbox input {
+  display: none; /* hide default checkbox */
+}
+
+/* The box that will show PNG */
+.checkmark {
+  width: 24px;
+  height: 24px;
+  /*background: white; /* background of the box */
+  
+  border: 2px solid #000;
+  border-radius: 4px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Show PNG when checked */
+.customCheckbox input:checked + .checkmark {
+  background-image: url('./assets/yes.png'); 
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import styled from "styled-components";
+
 function TodosViewForm({
   sortField,
   setSortField,
@@ -23,11 +25,11 @@ function TodosViewForm({
 
 
   return (
-    <form onSubmit={preventRefresh} style={{ marginBottom: "20px" }}>
+    <StyledForm onSubmit={preventRefresh} style={{ marginBottom: "20px" }}>
       {/* Search box */}
       <div>
   <label htmlFor="todo-search">Search todos: </label>
-  <input
+  <StyledInput
     id="todo-search"
     type="text"
     placeholder="Type to search..."
@@ -45,7 +47,7 @@ function TodosViewForm({
       {/* Sort field */}
       <div>
         <label htmlFor="sort-field">Sort by: </label>
-        <select id= "sort-field" value={`${sortField}-${sortDirection}`} 
+        <StyledSelect id= "sort-field" value={`${sortField}-${sortDirection}`} 
  onChange={(e) => {
     const [field, dir] = e.target.value.split("-");
     setSortField(field);      // → "Title"
@@ -55,26 +57,49 @@ function TodosViewForm({
        <option value="createdTime">Time Added</option>
             <option value="Title-asc">Title A–Z</option>
             <option value="Title-desc">Title Z–A</option>
-        </select>
+        </StyledSelect>
       </div>
 
       {/* Sort direction */}
       <div>
         <label htmlFor="sort-direction">Direction: </label>
-        <select id="sort-direction"
+        <StyledSelect id="sort-direction"
           value={sortDirection}
           onChange={(e) => setSortDirection(e.target.value)}
         >
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
-        </select>
+        </StyledSelect>
+        
         
       </div>
-    </form>
+    </StyledForm>
   );
 }
 
 export default TodosViewForm;
+
+/*  Styled Components  */
+const StyledForm = styled.form`
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+  flex-wrap: wrap;
+  border: 5px solid #8880ceff;
+  border-radius: 9px;
+`;
+
+const StyledInput = styled.input`
+  padding: 0.3rem;
+  border: 5px solid #80c2ceff;
+  border-radius: 9px;
+`;
+
+const StyledSelect = styled.select`
+  padding: 0.3rem;
+ border: 5px solid #80c2ceff;
+  border-radius: 9px;
+`;
 
 //Imported useState + useEffect.
 
