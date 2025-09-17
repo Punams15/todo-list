@@ -3,9 +3,6 @@
 body {
  margin: 0;
  padding: 0;
- background-color: #fff2df;
-  background: url("./assets/multi.jpg") no-repeat center center fixed;  
- background: url("./assets/bg2.jpeg") no-repeat center center fixed;
  background: url("./assets/floral.jpg") no-repeat center center fixed; 
  background-size: cover;
  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
