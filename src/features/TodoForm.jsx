@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useRef } from 'react';
 import TextInputWithLabel from '../shared/TextInputWithLabel';
+import styled from "styled-components";
+
 function TodoForm({ onAddTodo, isSaving }) {
   const [workingTodoTitle, setWorkingTodoTitle] = useState(''); // step:1 :Create Local state for input value
   const todoTitleInput = useRef(null); //keeping ref object to focus the input after submission
@@ -15,22 +17,45 @@ function TodoForm({ onAddTodo, isSaving }) {
     todoTitleInput.current.focus(); //This line tells the browser to put the cursor back inside the input box, so the user can immediately start typing the next todo without clicking the input again.
   }
   return (
-    <form onSubmit={handleAddTodo}>
+    <StyledForm onSubmit={handleAddTodo}>
       <TextInputWithLabel elementId="todoTitle"
       labelText ="Todo"
       ref={todoTitleInput}
       value={workingTodoTitle} // Controlled input value
       onChange={(e) => setWorkingTodoTitle(e.target.value)} //Update state on change
       />
-<button disabled={workingTodoTitle.trim() === ''}>
+<StyledButton disabled={workingTodoTitle.trim() === ''}>
   {isSaving ? 'Saving...' : 'Add Todo'}
-</button>
-    </form>
+  
+</StyledButton>
+</StyledForm>
+    
   );
 }
 export default TodoForm;
 
+/*  Styled Components  */
+const StyledForm = styled.form`
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 5px solid #80c2ceff;
+  border-radius: 9px;
+`;
+/*const StyledInput = styled.input`
+  flex: 1;
+  padding: 0.5rem;
+`; */
 
+const StyledButton = styled.button`
+  padding: 0.5rem 1rem;
+
+  &:disabled {
+    font-style: italic; 
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+`;
 
 //try this:
 //<button disabled={workingTodoTitle.trim() === ''}>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import TodoList from './features/TodoList/TodoList'
 import TodoForm from './features/TodoForm'
 import TodosViewForm from './features/TodosViewForm'
+import style from './App.module.css'
 function App() {
 // state Variables
   const [todoList, setTodoList] = useState([]);   // Stores all todos
@@ -117,12 +118,15 @@ fetchTodos()   //tells: You gotta start it!
       setIsSaving(false);
     }
   }
-  // Helper function to mark a todo as complete
+  // Toggle
   function CompleteTodo(id) {
-    const updatedTodos = todoList.map(todo => 
-      todo.id === id ? {...todo, isCompleted: true }: todo )
-    //update 'todos' state with 'updatedTodos
-    setTodoList(updatedTodos)    //calling the setTodoList function (the React state updater) and passing it the new list of todos (updatedTodos).That updates your component’s todoList state with the latest version.
+     setTodoList(prev =>
+    prev.map(todo =>
+    
+      todo.id === id ? {...todo, isCompleted: !todo.isCompleted }: todo 
+    )
+    )
+    
   }
 
   // Update an existing todo
@@ -134,7 +138,7 @@ fetchTodos()   //tells: You gotta start it!
   }
 
   return (
-    <div>
+    <div className={style.appContainer}>
       <h1>Todo List</h1>
      <TodoForm onAddTodo={addTodo} isSaving={isSaving} /> {/*Pass the function to an onAddTodo props on the TodoForm instance */}
 
@@ -171,8 +175,10 @@ fetchTodos()   //tells: You gotta start it!
      {/*show error message if any */}
      {errorMessage && (
       <>
+      <div className={style.errorMessage}>
       <p style ={{ color: "red" }} >{"NetworkError when attempting to fetch resource..Reverting todo.."}</p>
      <button onClick={() => setErrorMessage("")}>Dismiss Error Message</button>
+     </div>
      </>
   ) }
 </div>

@@ -1,0 +1,19 @@
+/* Center the app in the body */
+.appContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh; /* full viewport height */
+  font-family: sans-serif;
+}
+
+/* Error message styling */
+.errorMessage {
+  border: 1px solid red;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  color: red;
+  border-radius: 4px;
+  background-color: #ffe6e6;
+}
