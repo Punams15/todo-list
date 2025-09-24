@@ -1,158 +1,134 @@
-import './App.css'
-import { useCallback } from 'react'
-import { useEffect, useState } from 'react'
-import TodoList from './features/TodoList/TodoList'
-import TodoForm from './features/TodoForm'
-import TodosViewForm from './features/TodosViewForm'
-import style from './App.module.css'
+import React, { useEffect, useCallback, useReducer, useState } from 'react';
+import './App.css';
+import { reducer as todosReducer, actions as todoActions, initialState as initialTodosState } from './reducers/todos.reducer';
+import TodoList from './features/TodoList/TodoList';
+import TodoForm from './features/TodoForm';
+import TodosViewForm from './features/TodosViewForm';
+import style from './App.module.css';
+
 function App() {
-// state Variables
-  const [todoList, setTodoList] = useState([]);   // Stores all todos
-  const [isLoading, setIsLoading] = useState(false)//fetching todos ;No= false and Yes:true
-  const [errorMessage, setErrorMessage] = useState ("")//"" --> Start empty, no mistakes yet// Stores error messages
-  const [isSaving, setIsSaving]=useState(false)//while I'm saving mode before and mark saving started or finished..false:Not saving yet
+  const [todoState, dispatch] = useReducer(todosReducer, initialTodosState);
+  const { todoList, isLoading, isSaving, errorMessage } = todoState;
 
-  const [sortField, setSortField] = useState("createdTime")
-  const [sortDirection, setSortDirection] = useState("desc")
+  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
+  const token = `Bearer ${import.meta.env.VITE_PAT}`;
 
-  const [queryString, setQueryString] = useState(""); // search filter
+  const [sortField, setSortField] = useState('createdTime');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [queryString, setQueryString] = useState('');
 
- //Airtable constants
-  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`; //like the address where we send our request to get todos
-  const token = `Bearer ${import.meta.env.VITE_PAT}`;   //secret key
-
-// encodeUrl rewritten with useCallback
-const encodeUrl = useCallback(() => {
+  const encodeUrl = useCallback(() => {
     let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
     let searchQuery = "";
     if (queryString) {
-      searchQuery = `&filterByFormula=SEARCH("${queryString}", {Title})`; //capital T //+{Title} , + removed ,nothing changed in result?
+      searchQuery = `&filterByFormula=IF(SEARCH("${queryString}", {Title}), TRUE(), FALSE())`;
     }
     return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-  } , [sortField, sortDirection, queryString, url]);
+  }, [sortField, sortDirection, queryString, url]);
 
-//Fetch todos from Airtable 
+  // ------------------ Fetch todos ------------------
   useEffect(() => {
-    console.log("Fetching todos with query:", queryString)
-    
     const fetchTodos = async () => {
-      setIsLoading(true); // show loading spinner/message
+      dispatch({ type: todoActions.fetchTodos });
+      try {
+        const resp = await fetch(encodeUrl(), { headers: { Authorization: token } });
+        if (!resp.ok) throw new Error('NetworkError when attempting to fetch resource..Reverting todo..');
 
-      const options = {
-        method: "GET" ,
-        headers: {
-          Authorization: token             //it's like an envelope for our request, using GET methodwith my secret key
-        }
+        const { records } = await resp.json();
+        const todos = records
+          .map(record => ({
+            id: record.id,
+            ...record.fields,
+            isCompleted: record.fields.isCompleted ?? false,
+          }))
+          .filter(todo => todo.Title && todo.Title.trim() !== '');
+
+        dispatch({ type: todoActions.loadTodos, payload: todos });
+      } catch (error) {
+        dispatch({ type: todoActions.setLoadError, payload: error.message });
       }
-      try {                                  //catch the mistake if it doesn't work
-        const resp = await fetch(encodeUrl(), options)
-        if (!resp.ok) 
-          throw new Error(resp.statusText)                                          
+    };
+    fetchTodos();
+  }, [encodeUrl]);
 
-          const {records } = await resp.json()   //here recors holds our todos by taking the reply and turning it into an object
-         console.log(records)
-          const todos = records.map((record)=> {   //go through each to do from airtbale and make it match our app's style
-            const todo = {
-              id: record.id,                    //id comes from airtable, title and isCompleted come from fields
-            ...record.fields
-            }
-            if (!todo.isCompleted) todo.isCompleted = false; //Airtable skips false..and if airtable forgots to send isCompleted,we force it to be false
-            return todo
-          })
-          .filter(todo => todo.Title && todo.Title.trim() !=="") //remove empty todos
-          setTodoList(todos)        //stick all the todos onto out todoList sticky note
-        } catch (error) {
-          console.error(error)
-          setErrorMessage(error.message)   //If something went wrong, write the mistake on the error sticky note
-        } finally {
-          setIsLoading(false)   //At the very end (good or bad), tell the app: “We’re not busy anymore.”
-        }
-        }
-fetchTodos()   //tells: You gotta start it!
-   
-}, [sortField, sortDirection, queryString])   //refresh whenever these chnage //End of useEffect. The empty [] means: “Run this only once, when the app starts.”
-
- // Add new todo (pessimistic update)
+  // ------------------ Add Todo ------------------
   async function addTodo(Title) {
-    const newTodo = {
-      Title: Title,
-      isCompleted: false,
-    };
+    const newTodo = { Title, isCompleted: false };
+    const payload = { records: [{ fields: newTodo }] };
 
-    const payload = {       //like putting our sticky note inside an envelope
-      records: [           // records: list of letters (even its just one)
-        {
-          fields: newTodo,      // fields : the contents of the letter (Title +isCompleted)
-        },
-      ],
-    };
-
-    const options = {
-      method: "POST",     //POST= sedning somthing new
-      headers: {
-        Authorization: token,     //Authorization = my secret key so Airtbaale knowsit's me
-        "Content-Type": "application/json",   //info about type: in JSON language(special way to write data so that computer can understand it)
-      },
-      body: JSON.stringify(payload),   //body ->the letter contents (payload) turned intro string so Airtable can read it
-    };
-
+    dispatch({ type: todoActions.startRequest });
     try {
-      setIsSaving(true);    //info to user : saving your todo and change the button text to "saving"
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { Authorization: token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) throw new Error('NetworkError when attempting to fetch resource..Reverting todo..');
 
-      const resp = await fetch(url, options);  //Send the letter to Airtable and wait for the answer,If Airtable says something went wrong, we throw an error.
-      if (!resp.ok) throw new Error(resp.statusText)
-
-      const { records } = await resp.json();   //Airtable answers with the todo info.,//savedTodo = the todo from Airtable with a real unique ID
-      const savedTodo = {
-        id: records[0].id,
-        ...records[0].fields,
-      };
-
-      if (!records[0].fields.isCompleted) savedTodo.isCompleted = false; //Airtable might forget to send false.,So we make sure the new todo is marked not done.
-
-      setTodoList([...todoList, savedTodo]); //Add the new todo to our list on the screen.
-    } catch (error) {                    //catch → if anything goes wrong, show an error.
-      console.error(error);
-      setErrorMessage(error.message)
-    } finally {                         //finally → stop showing “Saving…” on the button, no matter what happened.
-      setIsSaving(false);
+      const { records } = await resp.json();
+      const savedTodo = { id: records[0].id, ...records[0].fields, isCompleted: records[0].fields.isCompleted ?? false };
+      dispatch({ type: todoActions.addTodo, payload: savedTodo });
+    } catch (error) {
+      dispatch({ type: todoActions.setLoadError, payload: error.message });
+    } finally {
+      dispatch({ type: todoActions.endRequest });
     }
   }
-  // Toggle
-  function CompleteTodo(id) {
-     setTodoList(prev =>
-    prev.map(todo =>
-    
-      todo.id === id ? {...todo, isCompleted: !todo.isCompleted }: todo 
-    )
-    )
-    
+
+  // ------------------ Update Todo ------------------
+  async function updateTodo(editedTodo) {
+    // Update locally first
+    dispatch({ type: todoActions.updateTodo, payload: editedTodo });
+
+    // Prepare payload for Airtable
+    const payload = { records: [{ id: editedTodo.id, fields: { Title: editedTodo.Title, isCompleted: editedTodo.isCompleted } }] };
+
+    try {
+      const resp = await fetch(url, {
+        method: 'PATCH',
+        headers: { Authorization: token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) throw new Error('Failed to update todo on Airtable');
+    } catch (error) {
+      dispatch({ type: todoActions.setLoadError, payload: error.message });
+    }
   }
 
-  // Update an existing todo
-  function updateTodo(editedTodo) {
-    const updatedTodos = todoList.map(todo =>
-      todo.id === editedTodo.id ? { ...editedTodo } : todo
-    );
-    setTodoList(updatedTodos);
+  // ------------------ Toggle Complete ------------------
+  async function CompleteTodo(id) {
+    const todo = todoList.find(t => t.id === id);
+    if (!todo) return;
+
+    const updatedTodo = { ...todo, isCompleted: !todo.isCompleted };
+    dispatch({ type: todoActions.completeTodo, payload: id });
+
+    // Send update to Airtable
+    const payload = { records: [{ id: id, fields: { isCompleted: updatedTodo.isCompleted } }] };
+    try {
+      const resp = await fetch(url, {
+        method: 'PATCH',
+        headers: { Authorization: token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) throw new Error('Failed to update completion status on Airtable');
+    } catch (error) {
+      dispatch({ type: todoActions.setLoadError, payload: error.message });
+    }
   }
 
   return (
     <div className={style.appContainer}>
       <h1>Todo List</h1>
-     <TodoForm onAddTodo={addTodo} isSaving={isSaving} /> {/*Pass the function to an onAddTodo props on the TodoForm instance */}
 
-       {/* Show the todos only when not loading */}
-    {!isLoading && (
-<TodoList todoList={todoList} onCompleteTodo={CompleteTodo} onUpdateTodo= {updateTodo}/>  
-  )
-  
-}
+      <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
 
-      {/* Separator line */}
-    <hr style={{ margin: "20px 0" }} />
+      {!isLoading && (
+        <TodoList todoList={todoList} onCompleteTodo={CompleteTodo} onUpdateTodo={updateTodo} />
+      )}
 
-         {/* Search + Sort Form */}
+      <hr style={{ margin: '20px 0' }} />
+
       <TodosViewForm
         sortField={sortField}
         setSortField={setSortField}
@@ -162,29 +138,48 @@ fetchTodos()   //tells: You gotta start it!
         setQueryString={setQueryString}
       />
 
-     
-     {/*show loading message */}
-     {isLoading && <p>Loading todos...</p>}
+      {isLoading && <p>Loading todos...</p>}
 
-
-
-
-   
-
- {/* Error message section at the bottom */}
-     {/*show error message if any */}
-     {errorMessage && (
-      <>
-      <div className={style.errorMessage}>
-      <p style ={{ color: "red" }} >{"NetworkError when attempting to fetch resource..Reverting todo.."}</p>
-     <button onClick={() => setErrorMessage("")}>Dismiss Error Message</button>
-     </div>
-     </>
-  ) }
-</div>
-  )
+      {errorMessage && (
+        <div className={style.errorMessage}>
+          <p style={{ color: 'red' }}>{errorMessage}</p>
+          <button onClick={() => dispatch({ type: todoActions.clearError })}>Dismiss Error Message</button>
+        </div>
+      )}
+    </div>
+  );
 }
-export default App
+
+export default App;
+
+
+
+
+// ------------------ Fetch todos ------------------
+//dispatch({ type: todoActions.loadTodos, payload: todos });
+
+// ------------------ Add Todo ------------------
+//dispatch({ type: todoActions.addTodo, payload: savedTodo });
+
+// ------------------ Toggle Complete ------------------
+//dispatch({ type: todoActions.completeTodo, payload: id });
+
+// ------------------ Update Todo ------------------
+//dispatch({ type: todoActions.updateTodo, payload: editedTodo });
+
+
+
+//Removed duplicate imports of reducer, actions, etc.
+
+//Replaced all useState variables (todoList, isLoading, isSaving, errorMessage) with the reducer’s todoState.
+
+//Used:const { todoList, isLoading, isSaving, errorMessage } = todoState;
+
+//Replaced setTodoList, setIsLoading, setIsSaving, setErrorMessage with dispatch(...).
+
+//Kept sortField, sortDirection, queryString as local state (not in reducer).
+
+//Cleaned up fetch logic to use dispatch(todoActions.loadTodos, records) instead of setTodoList.
 
 //https://airtable.com/app2RYFQ4XN5j7xYH/tblRbrnMaZvpJdPLj/viwDStds3dNFycPGd?blocks=hide
 
