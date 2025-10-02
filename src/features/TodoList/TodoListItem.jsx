@@ -4,7 +4,7 @@ import style from './TodoListItem.module.css';
 
 function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [workingTitle, setWorkingTitle] = useState(todo.Title);
+  const [workingtitle, setWorkingtitle] = useState(todo.title);
 
   function handleCancel() {
     setWorkingTitle(todo.Title);

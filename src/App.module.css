@@ -1,12 +1,17 @@
 /* Center the app in the body */
 .appContainer {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  flex-direction: column; /* stack content vertically */
   min-height: 100vh; /* full viewport height */
+  width: 100%;
+  max-width: 800px; /* optional, center with margin */
+  margin: 0 auto;
+  padding: 2rem 1rem;
   font-family: sans-serif;
+  background-color: rgba(255, 255, 255, 0.85); /* optional, makes content readable */
+  border-radius: 10px; /* optional */
 }
+
 
 /* Error message styling */
 .errorMessage {

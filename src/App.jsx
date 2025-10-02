@@ -1,149 +1,222 @@
-import React, { useEffect, useCallback, useReducer, useState } from 'react';
-import './App.css';
-import { reducer as todosReducer, actions as todoActions, initialState as initialTodosState } from './reducers/todos.reducer';
-import TodoList from './features/TodoList/TodoList';
-import TodoForm from './features/TodoForm';
-import TodosViewForm from './features/TodosViewForm';
-import style from './App.module.css';
+import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useReducer, useState, useCallback } from "react";
+import {
+  reducer as todosReducer,
+  actions as todoActions,
+  initialState as initialTodosState,
+  actions,
+} from "./reducers/todos.reducer";
+import TodosPage from "./pages/TodosPage";
+import About from "./pages/About";
+import NotFound from "./pages/NotFound";
+import Header from "./shared/Header";
+import AppStyles from './App.module.css';
 
 function App() {
   const [todoState, dispatch] = useReducer(todosReducer, initialTodosState);
-  const { todoList, isLoading, isSaving, errorMessage } = todoState;
 
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
   const token = `Bearer ${import.meta.env.VITE_PAT}`;
 
-  const [sortField, setSortField] = useState('createdTime');
-  const [sortDirection, setSortDirection] = useState('desc');
-  const [queryString, setQueryString] = useState('');
+  // const [todoList, setTodoList] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [isSaving, setIsSaving] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState('');
 
+  const [sortField, setSortField] = useState("createdTime");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [queryString, setQueryString] = useState("");
+
+  const location = useLocation();  // Keep track of page location (URL)
+  const [title, setTitle] = useState("Todo List");
+
+  // Update title based on current path
+  useEffect(() => {
+    if (location.pathname === "/") setTitle("Todo List");
+    else if (location.pathname === "/about") setTitle("About");
+    else setTitle("Not Found");
+  }, [location]);
+
+  // Encode Airtable URL with sorting & filtering
   const encodeUrl = useCallback(() => {
-    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
     let searchQuery = "";
     if (queryString) {
-      searchQuery = `&filterByFormula=IF(SEARCH("${queryString}", {Title}), TRUE(), FALSE())`;
+      searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
     }
+    const sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
     return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-  }, [sortField, sortDirection, queryString, url]);
+  }, [url, sortField, sortDirection, queryString]);
 
-  // ------------------ Fetch todos ------------------
+  // Fetch todos from Airtable
   useEffect(() => {
     const fetchTodos = async () => {
       dispatch({ type: todoActions.fetchTodos });
       try {
-        const resp = await fetch(encodeUrl(), { headers: { Authorization: token } });
-        if (!resp.ok) throw new Error('NetworkError when attempting to fetch resource..Reverting todo..');
+        const resp = await fetch(encodeUrl(), {
+          method: "GET",
+          headers: { Authorization: token },
+        });
+
+        //  Edited: standard error message
+        if (!resp.ok) throw new Error("NetworkError when attempting to fetch resource..Reverting todo..");
 
         const { records } = await resp.json();
-        const todos = records
-          .map(record => ({
-            id: record.id,
-            ...record.fields,
-            isCompleted: record.fields.isCompleted ?? false,
-          }))
-          .filter(todo => todo.Title && todo.Title.trim() !== '');
 
-        dispatch({ type: todoActions.loadTodos, payload: todos });
+        //  Edited: flatten records
+        const todos = records.map(record => ({
+          id: record.id,
+          ...record.fields
+        }));
+
+        dispatch({ type: todoActions.loadTodos, payload: todos }); // Edited
       } catch (error) {
-        dispatch({ type: todoActions.setLoadError, payload: error.message });
+        dispatch({ type: todoActions.setLoadError, error: error.message }); //  Edited for consistency
       }
     };
     fetchTodos();
-  }, [encodeUrl]);
+  }, [encodeUrl, token]);
 
-  // ------------------ Add Todo ------------------
-  async function addTodo(Title) {
-    const newTodo = { Title, isCompleted: false };
-    const payload = { records: [{ fields: newTodo }] };
+  // Add a new todo
+  const addTodo = async (title) => {
+   
+  if (!title.trim()) return; // prevent empty
 
-    dispatch({ type: todoActions.startRequest });
+  dispatch({ type: actions.startRequest });
+    const payload = {
+      records: [
+    { fields: { Title: title, IsCompleted: false } }
+      ]
+    };
+    
     try {
       const resp = await fetch(url, {
-        method: 'POST',
-        headers: { Authorization: token, 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { Authorization: token, "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!resp.ok) throw new Error('NetworkError when attempting to fetch resource..Reverting todo..');
+
+      // Edited: standard error message
+      if (!resp.ok) throw new Error("NetworkError when attempting to fetch resource..Reverting todo..");
 
       const { records } = await resp.json();
-      const savedTodo = { id: records[0].id, ...records[0].fields, isCompleted: records[0].fields.isCompleted ?? false };
-      dispatch({ type: todoActions.addTodo, payload: savedTodo });
+
+      // Edited: flatten records and pick first
+      const newTodo = records.map(record => ({
+        id: record.id,
+        ...record.fields
+      }))[0];
+
+      dispatch({ type: actions.addTodo, payload: newTodo }); // Edited: use payload
     } catch (error) {
-      dispatch({ type: todoActions.setLoadError, payload: error.message });
+      dispatch({ type: actions.setLoadError, error: error.message });
     } finally {
-      dispatch({ type: todoActions.endRequest });
+      dispatch({ type: actions.endRequest });
     }
-  }
+  };
 
-  // ------------------ Update Todo ------------------
-  async function updateTodo(editedTodo) {
-    // Update locally first
-    dispatch({ type: todoActions.updateTodo, payload: editedTodo });
-
-    // Prepare payload for Airtable
-    const payload = { records: [{ id: editedTodo.id, fields: { Title: editedTodo.Title, isCompleted: editedTodo.isCompleted } }] };
-
-    try {
-      const resp = await fetch(url, {
-        method: 'PATCH',
-        headers: { Authorization: token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!resp.ok) throw new Error('Failed to update todo on Airtable');
-    } catch (error) {
-      dispatch({ type: todoActions.setLoadError, payload: error.message });
-    }
-  }
-
-  // ------------------ Toggle Complete ------------------
-  async function CompleteTodo(id) {
-    const todo = todoList.find(t => t.id === id);
+  // Complete a todo
+  const completeTodo = async (id) => {
+    const todo = todoState.todoList.find((t) => t.id === id);
     if (!todo) return;
 
-    const updatedTodo = { ...todo, isCompleted: !todo.isCompleted };
-    dispatch({ type: todoActions.completeTodo, payload: id });
+    // Edited: use payload
+    dispatch({ type: actions.completeTodo, payload: id }); 
 
-    // Send update to Airtable
-    const payload = { records: [{ id: id, fields: { isCompleted: updatedTodo.isCompleted } }] };
+    dispatch({ type: actions.startRequest });
+
+    const payload = {
+  records: [
+    { 
+      id: editedTodo.id, 
+      fields: { 
+        Title: editedTodo.Title, 
+        IsCompleted: editedTodo.IsCompleted 
+      } 
+    }
+  ]
+};
+
+
     try {
       const resp = await fetch(url, {
-        method: 'PATCH',
-        headers: { Authorization: token, 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { Authorization: token, "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!resp.ok) throw new Error('Failed to update completion status on Airtable');
+
+      // Edited: standard error message
+      if (!resp.ok) throw new Error("NetworkError when attempting to fetch resource..Reverting todo..");
     } catch (error) {
-      dispatch({ type: todoActions.setLoadError, payload: error.message });
+      dispatch({ type: actions.revertTodo, originalTodo: todo, error: error.message });
+    } finally {
+      dispatch({ type: actions.endRequest });
     }
-  }
+  };
+
+  // Update a todo
+  const updateTodo = async (editedTodo) => {
+    const originalTodo = todoState.todoList.find((t) => t.id === editedTodo.id);
+    if (!originalTodo) return;
+
+    // Edited: use payload
+    dispatch({ type: actions.updateTodo, payload: editedTodo });
+
+    dispatch({ type: actions.startRequest });
+
+   const payload = {
+  records: [
+    { fields: { Title: title, IsCompleted: false } }
+  ]
+};
+
+    try {
+      const resp = await fetch(url, {
+        method: "PATCH",
+        headers: { Authorization: token, "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // Edited: standard error message
+      if (!resp.ok) throw new Error("NetworkError when attempting to fetch resource..Reverting todo..");
+    } catch (error) {
+     dispatch({ type: actions.setLoadError, payload: error.message }); // FIXED
+    } finally {
+      dispatch({ type: actions.endRequest });
+    }
+  };
 
   return (
-    <div className={style.appContainer}>
-      <h1>Todo List</h1>
+    <div className={AppStyles.appContainer}>
+      <Header title={title} />
 
-      <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <TodosPage
+              todoState={todoState}
+              addTodo={addTodo}
+              completeTodo={completeTodo}
+              updateTodo={updateTodo}
+              sortField={sortField}
+              setSortField={setSortField}
+              sortDirection={sortDirection}
+              setSortDirection={setSortDirection}
+              queryString={queryString}
+              setQueryString={setQueryString}
+              dispatch={dispatch}
+            />
+          }
+        />
+        <Route path="/about" element={<h1>About</h1>} />
+        <Route path="*" element={<h1>Not Found</h1>} />
+      </Routes>
 
-      {!isLoading && (
-        <TodoList todoList={todoList} onCompleteTodo={CompleteTodo} onUpdateTodo={updateTodo} />
-      )}
-
-      <hr style={{ margin: '20px 0' }} />
-
-      <TodosViewForm
-        sortField={sortField}
-        setSortField={setSortField}
-        sortDirection={sortDirection}
-        setSortDirection={setSortDirection}
-        queryString={queryString}
-        setQueryString={setQueryString}
-      />
-
-      {isLoading && <p>Loading todos...</p>}
-
-      {errorMessage && (
-        <div className={style.errorMessage}>
-          <p style={{ color: 'red' }}>{errorMessage}</p>
-          <button onClick={() => dispatch({ type: todoActions.clearError })}>Dismiss Error Message</button>
+      {todoState.errorMessage && (
+       <div className={AppStyles.errorMessage}>
+          {/* Edited: standardized message in UI */}
+          <p style={{ color: "red" }}>{"NetworkError when attempting to fetch resource..Reverting todo.."}</p>
+          <button onClick={() => dispatch({ type: actions.clearError })}>Dismiss</button>
         </div>
       )}
     </div>
@@ -151,6 +224,8 @@ function App() {
 }
 
 export default App;
+
+
 
 
 
