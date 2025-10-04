@@ -156,37 +156,41 @@ function App() {
     }
   };
 
-  // Update a todo
   const updateTodo = async (editedTodo) => {
-    const originalTodo = todoState.todoList.find((t) => t.id === editedTodo.id);
-    if (!originalTodo) return;
+  const originalTodo = todoState.todoList.find(t => t.id === editedTodo.id);
+  if (!originalTodo) return;
 
-    // Edited: use payload
-    dispatch({ type: actions.updateTodo, payload: editedTodo });
+  dispatch({ type: actions.updateTodo, payload: editedTodo });
+  dispatch({ type: actions.startRequest });
 
-    dispatch({ type: actions.startRequest });
+  const payload = {
+    records: [
+      {
+        id: editedTodo.id,
+        fields: {
+          Title: editedTodo.Title,
+          isCompleted: editedTodo.isCompleted
+        }
+      }
+    ]
+  };
 
-   const payload = {
-  records: [
-    { fields: { Title: title, IsCompleted: false } }
-  ]
+  try {
+    const resp = await fetch(url, {
+      method: "PATCH",
+      headers: { Authorization: token, "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!resp.ok) throw new Error("NetworkError when attempting to fetch resource..Reverting todo..");
+
+  } catch (error) {
+    dispatch({ type: actions.revertTodo, originalTodo, error: error.message });
+  } finally {
+    dispatch({ type: actions.endRequest });
+  }
 };
 
-    try {
-      const resp = await fetch(url, {
-        method: "PATCH",
-        headers: { Authorization: token, "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      // Edited: standard error message
-      if (!resp.ok) throw new Error("NetworkError when attempting to fetch resource..Reverting todo..");
-    } catch (error) {
-     dispatch({ type: actions.setLoadError, payload: error.message }); // FIXED
-    } finally {
-      dispatch({ type: actions.endRequest });
-    }
-  };
 
   // ---------------- JSX with background image ----------------
   return (
