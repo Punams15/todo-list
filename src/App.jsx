@@ -12,6 +12,9 @@ import NotFound from "./pages/NotFound";
 import Header from "./shared/Header";
 import AppStyles from './App.module.css';
 
+import floralBg from './assets/floral.jpg'; //Import background image and css
+import './App.css';
+
 function App() {
   const [todoState, dispatch] = useReducer(todosReducer, initialTodosState);
 
@@ -185,9 +188,26 @@ function App() {
     }
   };
 
+  // ---------------- JSX with background image ----------------
   return (
+    <div
+      style={{
+        backgroundImage: `url(${floralBg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center center",
+        backgroundAttachment: "fixed",
+        backgroundSize: "cover",
+        minHeight: "100vh",
+
+     display: "flex",
+    justifyContent: "center", // horizontal center
+    alignItems: "flex-start", // vertical align to top
+    paddingTop: "5rem",       // add some space from top
+      }}
+    >
     <div className={AppStyles.appContainer}>
-      <Header title={title} />
+      {/*<Header title={title} />*/}
+</div>
 
       <Routes>
         <Route

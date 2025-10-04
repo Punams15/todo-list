@@ -8,7 +8,6 @@ import { useEffect } from "react";
 
 function TodosPage({
   todoState,
-  addTodo,
   completeTodo,
   updateTodo,
   queryString,
@@ -27,33 +26,60 @@ function TodosPage({
   // Get current page from URL, default 1
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
-  // Filter todos by query string
-  const filteredTodos = todoState.todoList.filter(todo =>
-    todo.Title.toLowerCase().includes(queryString.toLowerCase())
-  );
+  // ---- ADD TODO HANDLER WITH AIRTABLE ----
+  const addTodoHandler = async (newTitle) => {
+    if (!newTitle.trim()) return; // prevent empty todos
 
-  const totalPages = Math.ceil(filteredTodos.length / itemsPerPage);
+    const newTodo = { Title: newTitle, isCompleted: false };
 
-  const indexOfFirstTodo = (currentPage - 1) * itemsPerPage;
-  const indexOfLastTodo = indexOfFirstTodo + itemsPerPage;
+    try {
+      dispatch({ type: todoActions.startRequest });
 
-  // Slice todos for current page
-  const currentTodos =
-    filteredTodos.length > 0
-      ? filteredTodos.slice(indexOfFirstTodo, indexOfLastTodo)
-      : [];
+      const AIRTABLE_ENDPOINT = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
+      const AIRTABLE_API_KEY = import.meta.env.VITE_PAT;
 
-  // Pagination handlers
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setSearchParams({ page: currentPage - 1 });
+      const response = await fetch(AIRTABLE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+        },
+        body: JSON.stringify({ fields: newTodo }),
+      });
+
+      const data = await response.json();
+
+      const savedTodo = {
+        id: data.id,
+        Title: data.fields.Title,
+        isCompleted: data.fields.isCompleted || false,
+      };
+
+      dispatch({ type: todoActions.addTodo, payload: savedTodo });
+
+    } catch (error) {
+      dispatch({ type: todoActions.setLoadError, payload: "Failed to save todo" });
+    } finally {
+      dispatch({ type: todoActions.endRequest });
     }
   };
 
+  // Filter todos directly from global state
+  const filteredTodos = todoState.todoList.filter(todo =>
+    (todo.Title || "").toLowerCase().includes((queryString || "").toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredTodos.length / itemsPerPage);
+  const indexOfFirstTodo = (currentPage - 1) * itemsPerPage;
+  const indexOfLastTodo = indexOfFirstTodo + itemsPerPage;
+  const currentTodos = filteredTodos.slice(indexOfFirstTodo, indexOfLastTodo);
+
+  // Pagination handlers
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setSearchParams({ page: currentPage - 1 });
+  };
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setSearchParams({ page: currentPage + 1 });
-    }
+    if (currentPage < totalPages) setSearchParams({ page: currentPage + 1 });
   };
 
   // Protect against invalid page numbers
@@ -66,9 +92,12 @@ function TodosPage({
   }, [currentPage, totalPages, navigate, todoState.isLoading]);
 
   return (
-    <>
-      <TodoForm onAddTodo={addTodo} isSaving={todoState.isSaving} />
+    <div className="todoAppContainer">
+    <h1>Todo List</h1>
+      {/* Add Todo Form */}
+      <TodoForm onAddTodo={addTodoHandler} isSaving={todoState.isSaving} />
 
+      {/* Todo List */}
       {todoState.isLoading ? (
         <p>Loading todos...</p>
       ) : currentTodos.length > 0 ? (
@@ -97,11 +126,7 @@ function TodosPage({
           <button onClick={handlePreviousPage} disabled={currentPage === 1}>
             Previous
           </button>
-
-          <span>
-            Page {currentPage} of {totalPages || 1}
-          </span>
-
+          <span>Page {currentPage} of {totalPages || 1}</span>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages || totalPages === 0}
@@ -113,6 +138,7 @@ function TodosPage({
 
       <hr />
 
+      {/* Sorting / Filtering */}
       <TodosViewForm
         sortDirection={sortDirection}
         setSortDirection={setSortDirection}
@@ -122,6 +148,7 @@ function TodosPage({
         setQueryString={setQueryString}
       />
 
+      {/* Error Message */}
       {todoState.errorMessage && (
         <div className={AppStyles.errorMessage}>
           <hr />
@@ -131,11 +158,8 @@ function TodosPage({
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
 export default TodosPage;
-
-
-
