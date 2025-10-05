@@ -13,7 +13,7 @@
   min-height: 100vh; /* ensures it cover viewport */
   display: flex;
   flex-direction: column; /* stack content vertically */
-  padding: 2rem;
+  /*padding: 2rem;*/
   width: 100%;
 }
 

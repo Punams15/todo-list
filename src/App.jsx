@@ -210,7 +210,9 @@ function App() {
       }}
     >
     <div className={AppStyles.appContainer}>
+    
       {/*<Header title={title} />*/}
+      <Header  />
 </div>
 
       <Routes>
