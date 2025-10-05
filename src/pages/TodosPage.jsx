@@ -93,7 +93,7 @@ function TodosPage({
 
   return (
     <div className="todoAppContainer">
-    <h1>Todo List</h1>
+    <h1>Todo List <img src="/src/assets/icon2.png" alt="test" style={{ width: "60px" }} /></h1>
       {/* Add Todo Form */}
       <TodoForm onAddTodo={addTodoHandler} isSaving={todoState.isSaving} />
 
