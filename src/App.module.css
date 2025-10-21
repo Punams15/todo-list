@@ -1,12 +1,34 @@
 /* Center the app in the body */
-.appContainer {
+/*.appContainer {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  min-height: 100vh; /* full viewport height */
+  flex-direction: column; /* stack content vertically */
+ /* min-height: 100vh; /* full viewport height */
+ /* width: 100%;
+  max-width: 800px; /* optional, center with margin */
+ /* margin: 0 auto;
+  padding: 2rem 1rem;
   font-family: sans-serif;
+  background-color: rgba(255, 255, 255, 0.85); /* optional, makes content readable */
+  /*border-radius: 10px; /* optional */
+
+
+
+
+/* Make the body a full-screen flex container */
+body {
+  display: flex;
+  justify-content: center; /* horizontal centering */
+  align-items: center;     /* vertical centering */
+  min-height: 100vh;       /* take full viewport height */
+  margin: 0;               /* remove default margins */
+  background-color: #f0f2f5; /* optional background color */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  /*font-family: sans-serif;*/
+  /*max-width: 800px;*/
+  /*margin: 0 auto;*/
 }
+
 
 /* Error message styling */
 .errorMessage {
@@ -17,3 +39,4 @@
   border-radius: 4px;
   background-color: #ffe6e6;
 }
+

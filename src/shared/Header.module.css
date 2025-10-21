@@ -1,0 +1,27 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.title {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.nav {
+  display: flex;
+  gap: 15px;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.active {
+  color: gray; /* subdued color */
+}
+
+.inactive {
+  color: black; /* primary color */
+}

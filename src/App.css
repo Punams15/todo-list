@@ -1,25 +1,29 @@
-/* Background */
-/* Global font families */
-body {
- margin: 0;
- padding: 0;
- background: url("./assets/floral.jpg") no-repeat center center fixed; 
- background-size: cover;
- font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-#root {
+/* Background and global font families */
+/*body {
+  margin: 0;
+  padding: 0;
+  background: url("./assets/floral.jpg") no-repeat center center fixed; 
+  background-size: cover;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 2rem;
 }
+
+/* Root container */
+#root {
+  min-height: 100vh; /* ensures it cover viewport */
+  display: flex;
+  flex-direction: column; /* stack content vertically */
+  /*padding: 2rem;*/
+  width: 100%;
+}
+
 /* Headings use a different font */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Georgia', serif;
   margin: 0.5rem 0;
   color: #1a2a3a; /* darker heading color */
 }
+
 /* Buttons */
 button {
   padding: 0.5rem 1rem;
@@ -39,16 +43,24 @@ button:disabled {
   background-color: #a7b3c4;
   cursor: not-allowed;
 }
+
 /* Inputs */
 input, textarea {
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
-  /*width: 100%;*/
   box-sizing: border-box;
 }
-
-
-
-
+.appContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* better than center for your todo list */
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: sans-serif;
+  width: 100%;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
